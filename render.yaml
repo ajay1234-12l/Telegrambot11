@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: telegrambot11
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python main.py"
+    envVars:
+      - key: API_ID
+        value: 22918556
+      - key: API_HASH
+        value: 383f626d5ee3680f28906e3883bb862d
