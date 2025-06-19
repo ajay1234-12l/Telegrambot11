@@ -18,29 +18,17 @@ def get_sessions():
 def index():
     message = ""
     if request.method == "POST":
-        link = request.form.get("link")
-        if link:
-            message = join_all(link)
-    return render_template("index.html", message=message)
-
-def join_all(link):
-    sessions = get_sessions()
-    success = 0
-    fail = 0
-
-    for s in sessions:
         try:
-            client = TelegramClient(s, API_ID, API_HASH)
-            client.connect()
-            if not client.is_user_authorized():
-                continue
-            entity = client.get_entity(link)
-            client(JoinChannelRequest(entity))
-            success += 1
-            client.disconnect()
+            link = request.form["link"]
+            for session_file in os.listdir():
+                if session_file.endswith(".session"):
+                    client = TelegramClient(session_file, api_id, api_hash)
+                    client.connect()
+                    if not client.is_user_authorized():
+                        continue
+                    client(ImportChatInviteRequest(link.split("/")[-1]))
+                    client.disconnect()
+            message = "✅ Join request sent!"
         except Exception as e:
-            fail += 1
-    return f"Join requests sent: ✅ {success} | ❌ {fail}"
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+            message = f"❌ Error: {str(e)}"
+    return render_template("index.html", message=message)
